@@ -36,7 +36,17 @@ rollback() {
   rm -rf "$install_path"
 }
 
-trap 'status=$?; trap - EXIT; if [ "$status" -ne 0 ]; then rollback; fi; exit "$status"' EXIT
+install_exit() {
+  local status=$?
+
+  trap - EXIT
+  if [ "$status" -ne 0 ]; then
+    rollback
+  fi
+  exit "$status"
+}
+
+trap install_exit EXIT
 
 install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
 
