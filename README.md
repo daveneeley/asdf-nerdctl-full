@@ -54,19 +54,8 @@ install & manage versions.
 # Additional Commands
 
 ```shell
-# Set CNI_PATH while installing rootless containerd and BuildKit
-cni_path="$(asdf where nerdctl-full)/bin/cni"
-CNI_PATH="$cni_path" containerd-rootless-setuptool.sh install
-CNI_PATH="$cni_path" containerd-rootless-setuptool.sh install-buildkit
-
-# Persist CNI_PATH in both user systemd services
-mkdir -p ~/.config/systemd/user/containerd.service.d
-mkdir -p ~/.config/systemd/user/buildkit.service.d
-printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
-  >~/.config/systemd/user/containerd.service.d/nerdctl-full.conf
-printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
-  >~/.config/systemd/user/buildkit.service.d/nerdctl-full.conf
-systemctl --user daemon-reload
+# Rootless containerd and BuildKit are configured automatically during install
+asdf install nerdctl-full latest
 
 # Manage containerd and BuildKit
 systemctl --user start containerd.service

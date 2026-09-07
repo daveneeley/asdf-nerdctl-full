@@ -9,3 +9,26 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 source "${plugin_dir}/lib/utils.bash"
 
 install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
+
+if [ "$(uname -s)" = "Linux" ] &&
+  command -v systemctl >/dev/null 2>&1 &&
+  systemctl --user show-environment >/dev/null 2>&1; then
+  install_path="${ASDF_INSTALL_PATH%/bin}/bin"
+  cni_path="$install_path/cni"
+  systemd_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+
+  mkdir -p \
+    "$systemd_user_dir/containerd.service.d" \
+    "$systemd_user_dir/buildkit.service.d"
+  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
+    >"$systemd_user_dir/containerd.service.d/nerdctl-full.conf"
+  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
+    >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
+  systemctl --user daemon-reload
+
+  CNI_PATH="$cni_path" "$install_path/containerd-rootless-setuptool.sh" install
+  CNI_PATH="$cni_path" "$install_path/containerd-rootless-setuptool.sh" install-buildkit
+else
+  printf '%s\n' \
+    "Skipping rootless containerd and BuildKit setup: Linux user systemd is unavailable." >&2
+fi
