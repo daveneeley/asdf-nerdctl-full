@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+install_path="${ASDF_INSTALL_PATH%/bin}/bin"
+setuptool="$install_path/containerd-rootless-setuptool.sh"
+rootlesskit="$install_path/rootlesskit"
+systemd_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+
+if [ "$(uname -s)" != "Linux" ] ||
+  ! command -v systemctl >/dev/null 2>&1 ||
+  ! systemctl --user show-environment >/dev/null 2>&1; then
+  exit 0
+fi
+
+if [ -x "$setuptool" ]; then
+  "$setuptool" uninstall-buildkit
+  "$setuptool" uninstall
+fi
+
+rm -rf \
+  "$systemd_user_dir/containerd.service.d" \
+  "$systemd_user_dir/buildkit.service.d"
+systemctl --user daemon-reload
+
+if [ -x "$rootlesskit" ]; then
+  "$rootlesskit" rm -rf "$HOME/.local/share/containerd"
+fi
