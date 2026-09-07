@@ -54,7 +54,7 @@ if [ "$(uname -s)" = "Linux" ] &&
     >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
   systemctl --user daemon-reload
 
-  export PATH="$install_path:$PATH"
+  export PATH="$install_path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   export CNI_PATH="$cni_path"
   "$install_path/containerd-rootless-setuptool.sh" install
   "$install_path/containerd-rootless-setuptool.sh" install-buildkit
