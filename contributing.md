@@ -7,6 +7,9 @@ asdf plugin test <plugin-name> <plugin-url> [--asdf-tool-version <version>] [--a
 
 #
 asdf plugin test nerdctl-full https://github.com/daveneeley/asdf-nerdctl-full.git --asdf-tool-version latest "nerdctl -h"
+
+# Run an asdf extension command
+asdf cmd nerdctl-full containerd-start
 ```
 
 Tests are automatically run in GitHub Actions on push and PR.

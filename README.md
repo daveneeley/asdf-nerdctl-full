@@ -55,19 +55,19 @@ install & manage versions.
 
 ```shell
 # Get help on containerd
-asdf nerdctl-full containerd
+asdf cmd nerdctl-full help
 
 # Install containerd with systemd
-asdf nerdctl-full containerd systemd
+asdf cmd nerdctl-full containerd-systemd
 
 # Install containerd for openrc
-asdf nerdctl-full containerd openrc
+asdf cmd nerdctl-full containerd-openrc
 
 # Start containerd in foreground
-asdf nerdctl-full containerd start
+asdf cmd nerdctl-full containerd-start
 
 # Stop or cleanup containerd started in foreground
-asdf nerdctl-full containerd stop
+asdf cmd nerdctl-full containerd-stop
 
 ```
 
