@@ -43,7 +43,7 @@ install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH
 if [ "$(uname -s)" = "Linux" ] &&
   command -v systemctl >/dev/null 2>&1 &&
   systemctl --user show-environment >/dev/null 2>&1; then
-  cni_path="$install_path/cni"
+  cni_path="${ASDF_INSTALL_PATH%/bin}/libexec/cni"
 
   mkdir -p \
     "$systemd_user_dir/containerd.service.d" \
@@ -56,6 +56,7 @@ if [ "$(uname -s)" = "Linux" ] &&
 
   export PATH="$install_path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   export CNI_PATH="$cni_path"
+  systemctl --user set-environment "CNI_PATH=$cni_path"
   "$install_path/containerd-rootless-setuptool.sh" install
   "$install_path/containerd-rootless-setuptool.sh" install-buildkit
 else
