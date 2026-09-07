@@ -63,6 +63,12 @@ systemctl --user stop containerd.service
 systemctl --user start buildkit.service
 systemctl --user stop buildkit.service
 
+# Uninstall rootless BuildKit and containerd
+nerdctl_full_bin="$(asdf where nerdctl-full)/bin"
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall-buildkit
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/containerd"
+
 ```
 
 # Contributing
