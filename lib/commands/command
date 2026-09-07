@@ -10,8 +10,8 @@ You'll need to open a second terminal session to interact with nerdctl.
 If you use Ctrl+C to kill containerd, you should follow it up with
 the containerd stop command to cleanup leftovers.
 
-Start: wsl-nerdctl containerd start
-Stop (or cleanup): wsl-nerdctl containerd stop
+Start nerdctl-full containerd start
+Stop (or cleanup): nerdctl-full containerd stop
 
 ------------------- systemd ---------------------
 WSL2 supports systemd. If available, you may consider running containerd
@@ -31,7 +31,7 @@ systemd=true
 
 Once you have configured systemd and rebooted WSL, run the containerd systemd command.
 
-Setup systemd: wsl-nerdctl containerd systemd
+Setup systemd: nerdctl-full containerd systemd
 
 Runs containerd-rootless-systemdtool.sh from the containerd package.
 
@@ -50,7 +50,7 @@ command = "/usr/bin/env -i /usr/bin/unshare --pid --mount-proc --fork --propagat
 
 Once you have configured systemd and rebooted WSL, run the containerd openrc command.
 
-Setup systemd: wsl-nerdctl containerd systemd
+Setup systemd: nerdctl-full containerd systemd
 
 
 ------------------- notes ------------------------

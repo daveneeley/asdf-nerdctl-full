@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for wsl-nerdctl.
+# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for nerdctl-full.
 GH_REPO="https://github.com/containerd/nerdctl"
-TOOL_NAME="wsl-nerdctl"
+TOOL_NAME="nerdctl-full"
 TOOL_TEST="nerdctl --version"
 
 fail() {
@@ -75,7 +75,7 @@ install_version() {
     mkdir -p "$install_path"
     cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-    # TODO: Assert wsl-nerdctl executable exists.
+    # TODO: Assert nerdctl-full executable exists.
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
