@@ -43,7 +43,7 @@ install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH
 if [ "$(uname -s)" = "Linux" ] &&
   command -v systemctl >/dev/null 2>&1 &&
   systemctl --user show-environment >/dev/null 2>&1; then
-  cni_path="${ASDF_INSTALL_PATH%/bin}/libexec/cni"
+  cni_path="$install_path/cni"
 
   mkdir -p \
     "$systemd_user_dir/containerd.service.d" \
