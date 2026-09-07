@@ -1,15 +1,15 @@
 <div align="center">
 
-# asdf-wsl-nerdctl [![Build](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/build.yml/badge.svg)](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/build.yml) [![Lint](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/lint.yml/badge.svg)](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/lint.yml)
+# asdf-nerdctl-full [![Build](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/build.yml/badge.svg)](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/build.yml) [![Lint](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/lint.yml/badge.svg)](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/lint.yml)
 
 
-[wsl-nerdctl](https://github.com/daveneeley/asdf-wsl-nerdctl) plugin for the [asdf version manager](https://asdf-vm.com).
+[nerdctl-full](https://github.com/daveneeley/asdf-nerdctl-full) plugin for the [asdf version manager](https://asdf-vm.com).
 
 </div>
 
 # Contents
 
-- [asdf-wsl-nerdctl  ](#asdf-wsl-nerdctl--)
+- [asdf-nerdctl-full  ](#asdf-nerdctl-full--)
 - [Contents](#contents)
 - [Dependencies](#dependencies)
 - [Install](#install)
@@ -27,24 +27,24 @@
 Plugin:
 
 ```shell
-asdf plugin add wsl-nerdctl
+asdf plugin add nerdctl-full
 # or
-asdf plugin add wsl-nerdctl https://github.com/daveneeley/asdf-wsl-nerdctl.git
+asdf plugin add nerdctl-full https://github.com/daveneeley/asdf-nerdctl-full.git
 ```
 
-wsl-nerdctl:
+nerdctl-full:
 
 ```shell
 # Show all installable versions
-asdf list-all wsl-nerdctl
+asdf list-all nerdctl-full
 
 # Install specific version
-asdf install wsl-nerdctl latest
+asdf install nerdctl-full latest
 
 # Set a version globally (on your ~/.tool-versions file)
-asdf global wsl-nerdctl latest
+asdf global nerdctl-full latest
 
-# Now wsl-nerdctl commands are available
+# Now nerdctl-full commands are available
 nerdctl -h
 ```
 
@@ -55,19 +55,19 @@ install & manage versions.
 
 ```shell
 # Get help on containerd
-asdf wsl-nerdctl containerd
+asdf nerdctl-full containerd
 
 # Install containerd with systemd
-asdf wsl-nerdctl containerd systemd
+asdf nerdctl-full containerd systemd
 
 # Install containerd for openrc
-asdf wsl-nerdctl containerd openrc
+asdf nerdctl-full containerd openrc
 
 # Start containerd in foreground
-asdf wsl-nerdctl containerd start
+asdf nerdctl-full containerd start
 
 # Stop or cleanup containerd started in foreground
-asdf wsl-nerdctl containerd stop
+asdf nerdctl-full containerd stop
 
 ```
 
@@ -75,7 +75,7 @@ asdf wsl-nerdctl containerd stop
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
 
-[Thanks goes to these contributors](https://github.com/daveneeley/asdf-wsl-nerdctl/graphs/contributors)!
+[Thanks goes to these contributors](https://github.com/daveneeley/asdf-nerdctl-full/graphs/contributors)!
 
 # License
 

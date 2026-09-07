@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# run containerd setup with systemd
+
+containerDPath=$(asdf which containerd)
+buildkitDPath=$(asdf which buildkitd)
+binDir=$(dirname -- "$containerDPath")
+
+"$binDir/containerd-rootless-setuptool.sh" install
+
+nerdctlPath=$(asdf which nerdctl)
+test -x "$nerdctlPath" || {
+  echo "nerdctl not executable at $nerdctlPath." >&2
+  exit 1
+}
+sudo chown root "$nerdctlPath" || {
+  echo "Could not change owner to root on $nerdctlPath." >&2
+  exit 1
+}
+sudo chmod +s "$nerdctlPath" || {
+  echo "Could not setuid on $nerdctlPath." >&2
+  exit 1
+}
+
+cat << 'HELP'
+
+You may now use containerd with systemctl.
+
+systemctl containerd start
+systemctl containerd stop
+
+HELP
