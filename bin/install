@@ -58,7 +58,19 @@ if [ "$(uname -s)" = "Linux" ] &&
   export CNI_PATH="$cni_path"
   systemctl --user set-environment "CNI_PATH=$cni_path"
   "$install_path/containerd-rootless-setuptool.sh" install
-  "$install_path/containerd-rootless-setuptool.sh" install-buildkit
+
+  buildkit_install_status=0
+  "$install_path/containerd-rootless-setuptool.sh" install-buildkit ||
+    buildkit_install_status=$?
+
+  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
+    >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
+  systemctl --user daemon-reload
+
+  if [ "$buildkit_install_status" -ne 0 ]; then
+    systemctl --user restart buildkit.service
+  fi
+  systemctl --user is-active --quiet buildkit.service
 else
   printf '%s\n' \
     "Skipping rootless containerd and BuildKit setup: Linux user systemd is unavailable." >&2
