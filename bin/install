@@ -26,8 +26,10 @@ if [ "$(uname -s)" = "Linux" ] &&
     >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
   systemctl --user daemon-reload
 
-  CNI_PATH="$cni_path" "$install_path/containerd-rootless-setuptool.sh" install
-  CNI_PATH="$cni_path" "$install_path/containerd-rootless-setuptool.sh" install-buildkit
+  PATH="$install_path:$PATH" CNI_PATH="$cni_path" \
+    "$install_path/containerd-rootless-setuptool.sh" install
+  PATH="$install_path:$PATH" CNI_PATH="$cni_path" \
+    "$install_path/containerd-rootless-setuptool.sh" install-buildkit
 else
   printf '%s\n' \
     "Skipping rootless containerd and BuildKit setup: Linux user systemd is unavailable." >&2
