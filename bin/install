@@ -50,8 +50,10 @@ if [ "$(uname -s)" = "Linux" ] &&
     "$systemd_user_dir/buildkit.service.d"
   printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
     >"$systemd_user_dir/containerd.service.d/nerdctl-full.conf"
-  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
-    >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
+  cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
+[Service]
+Environment=CNI_PATH=$cni_path
+EOF
   systemctl --user daemon-reload
 
   export PATH="$install_path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -63,8 +65,12 @@ if [ "$(uname -s)" = "Linux" ] &&
   "$install_path/containerd-rootless-setuptool.sh" install-buildkit ||
     buildkit_install_status=$?
 
-  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
-    >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf"
+  cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
+[Service]
+Environment=CNI_PATH=$cni_path
+ExecStart=
+ExecStart=$install_path/containerd-rootless-setuptool.sh nsenter -- buildkitd --oci-worker=true --oci-worker-rootless=true --containerd-worker=false --oci-worker-net=bridge --oci-cni-binary-dir=$cni_path
+EOF
   systemctl --user daemon-reload
 
   if [ "$buildkit_install_status" -ne 0 ]; then
