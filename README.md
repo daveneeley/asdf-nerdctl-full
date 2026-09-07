@@ -54,20 +54,18 @@ install & manage versions.
 # Additional Commands
 
 ```shell
-# Get help on containerd
-asdf cmd nerdctl-full help
+# Install rootless containerd and BuildKit
+containerd-rootless-setuptool.sh install
+containerd-rootless-setuptool.sh install-buildkit
 
-# Install containerd with systemd
-asdf cmd nerdctl-full containerd-systemd
+# Make the CNI path available to user systemd services
+systemctl --user set-environment CNI_PATH="$(asdf where nerdctl-full)/bin/cni"
 
-# Install containerd for openrc
-asdf cmd nerdctl-full containerd-openrc
-
-# Start containerd in foreground
-asdf cmd nerdctl-full containerd-start
-
-# Stop or cleanup containerd started in foreground
-asdf cmd nerdctl-full containerd-stop
+# Manage containerd and BuildKit
+systemctl --user start containerd.service
+systemctl --user stop containerd.service
+systemctl --user start buildkit.service
+systemctl --user stop buildkit.service
 
 ```
 

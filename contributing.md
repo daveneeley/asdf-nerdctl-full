@@ -8,8 +8,9 @@ asdf plugin test <plugin-name> <plugin-url> [--asdf-tool-version <version>] [--a
 #
 asdf plugin test nerdctl-full https://github.com/daveneeley/asdf-nerdctl-full.git --asdf-tool-version latest "nerdctl -h"
 
-# Run an asdf extension command
-asdf cmd nerdctl-full containerd-start
+# Install rootless containerd and BuildKit
+containerd-rootless-setuptool.sh install
+containerd-rootless-setuptool.sh install-buildkit
 ```
 
 Tests are automatically run in GitHub Actions on push and PR.
