@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-export CNI_PATH=${ASDF_INSTALL_PATH}/bin/cni
+export CNI_PATH="${ASDF_INSTALL_PATH}/bin/cni"
+
+if command -v systemctl >/dev/null 2>&1 &&
+  systemctl --user show-environment >/dev/null 2>&1; then
+  systemctl --user set-environment "CNI_PATH=${CNI_PATH}"
+fi

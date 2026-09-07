@@ -1,15 +1,15 @@
 <div align="center">
 
-# asdf-wsl-nerdctl [![Build](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/build.yml/badge.svg)](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/build.yml) [![Lint](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/lint.yml/badge.svg)](https://github.com/daveneeley/asdf-wsl-nerdctl/actions/workflows/lint.yml)
+# asdf-nerdctl-full [![Build](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/build.yml/badge.svg)](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/build.yml) [![Lint](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/lint.yml/badge.svg)](https://github.com/daveneeley/asdf-nerdctl-full/actions/workflows/lint.yml)
 
 
-[wsl-nerdctl](https://github.com/daveneeley/asdf-wsl-nerdctl) plugin for the [asdf version manager](https://asdf-vm.com).
+[nerdctl-full](https://github.com/daveneeley/asdf-nerdctl-full) plugin for the [asdf version manager](https://asdf-vm.com).
 
 </div>
 
 # Contents
 
-- [asdf-wsl-nerdctl  ](#asdf-wsl-nerdctl--)
+- [asdf-nerdctl-full  ](#asdf-nerdctl-full--)
 - [Contents](#contents)
 - [Dependencies](#dependencies)
 - [Install](#install)
@@ -27,24 +27,24 @@
 Plugin:
 
 ```shell
-asdf plugin add wsl-nerdctl
+asdf plugin add nerdctl-full
 # or
-asdf plugin add wsl-nerdctl https://github.com/daveneeley/asdf-wsl-nerdctl.git
+asdf plugin add nerdctl-full https://github.com/daveneeley/asdf-nerdctl-full.git
 ```
 
-wsl-nerdctl:
+nerdctl-full:
 
 ```shell
 # Show all installable versions
-asdf list-all wsl-nerdctl
+asdf list-all nerdctl-full
 
 # Install specific version
-asdf install wsl-nerdctl latest
+asdf install nerdctl-full latest
 
 # Set a version globally (on your ~/.tool-versions file)
-asdf global wsl-nerdctl latest
+asdf global nerdctl-full latest
 
-# Now wsl-nerdctl commands are available
+# Now nerdctl-full commands are available
 nerdctl -h
 ```
 
@@ -54,28 +54,61 @@ install & manage versions.
 # Additional Commands
 
 ```shell
-# Get help on containerd
-asdf wsl-nerdctl containerd
+# Rootless containerd and BuildKit are configured automatically during install
+asdf install nerdctl-full latest
 
-# Install containerd with systemd
-asdf wsl-nerdctl containerd systemd
+# Manage containerd and BuildKit
+systemctl --user start containerd.service
+systemctl --user stop containerd.service
+systemctl --user start buildkit.service
+systemctl --user stop buildkit.service
 
-# Install containerd for openrc
-asdf wsl-nerdctl containerd openrc
+# Uninstall rootless BuildKit and containerd
+nerdctl_full_bin="$(asdf where nerdctl-full)/bin"
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall-buildkit
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/buildkit"
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/containerd"
 
-# Start containerd in foreground
-asdf wsl-nerdctl containerd start
+```
 
-# Stop or cleanup containerd started in foreground
-asdf wsl-nerdctl containerd stop
+# Testing Plugin Changes
 
+The installer creates fixed user systemd units named `containerd.service` and
+`buildkit.service`. Do not use `asdf plugin test`, because its temporary
+`asdf-test-nerdctl-full` plugin shares those units with `nerdctl-full`.
+
+Commit and push changes to a branch before testing. Update the existing plugin
+in place and install the latest nerdctl-full release:
+
+```shell
+branch="v0.19"
+git add .
+git commit -m "describe the change"
+git push origin "$branch"
+
+asdf plugin update nerdctl-full "$branch"
+asdf uninstall nerdctl-full 2.3.5
+asdf install nerdctl-full latest
+nerdctl --version
+```
+
+If a previous test left services or data behind, clean them up before retrying:
+
+```shell
+nerdctl_full_bin="$(asdf where nerdctl-full)/bin"
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall-buildkit || true
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall || true
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/buildkit" || true
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/containerd" || true
+systemctl --user daemon-reload
 ```
 
 # Contributing
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
 
-[Thanks goes to these contributors](https://github.com/daveneeley/asdf-wsl-nerdctl/graphs/contributors)!
+[Thanks goes to these contributors](https://github.com/daveneeley/asdf-nerdctl-full/graphs/contributors)!
 
 # License
 
