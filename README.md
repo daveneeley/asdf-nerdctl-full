@@ -72,6 +72,38 @@ nerdctl_full_bin="$(asdf where nerdctl-full)/bin"
 
 ```
 
+# Testing Plugin Changes
+
+The installer creates fixed user systemd units named `containerd.service` and
+`buildkit.service`. Do not use `asdf plugin test`, because its temporary
+`asdf-test-nerdctl-full` plugin shares those units with `nerdctl-full`.
+
+Commit and push changes to a branch before testing. Update the existing plugin
+in place and install the latest nerdctl-full release:
+
+```shell
+branch="v0.19"
+git add .
+git commit -m "describe the change"
+git push origin "$branch"
+
+asdf plugin update nerdctl-full "$branch"
+asdf uninstall nerdctl-full 2.3.5
+asdf install nerdctl-full latest
+nerdctl --version
+```
+
+If a previous test left services or data behind, clean them up before retrying:
+
+```shell
+nerdctl_full_bin="$(asdf where nerdctl-full)/bin"
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall-buildkit || true
+"$nerdctl_full_bin/containerd-rootless-setuptool.sh" uninstall || true
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/buildkit" || true
+"$nerdctl_full_bin/rootlesskit" rm -rf "$HOME/.local/share/containerd" || true
+systemctl --user daemon-reload
+```
+
 # Contributing
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
