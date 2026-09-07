@@ -53,40 +53,48 @@ install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH
 if [ "$(uname -s)" = "Linux" ] &&
   command -v systemctl >/dev/null 2>&1 &&
   systemctl --user show-environment >/dev/null 2>&1; then
-  cni_path="$install_path/cni"
+  apparmor_userns_setting=/proc/sys/kernel/apparmor_restrict_unprivileged_userns
+  if [ -r "$apparmor_userns_setting" ] &&
+    [ "$(<"$apparmor_userns_setting")" = "1" ]; then
+    printf '%s\n' \
+      "Skipping rootless containerd and BuildKit setup: /proc/sys/kernel/apparmor_restrict_unprivileged_userns is set to 1." \
+      "Set it to 0 before reinstalling to enable rootless services." >&2
+  else
+    cni_path="$install_path/cni"
 
-  mkdir -p \
-    "$systemd_user_dir/containerd.service.d" \
-    "$systemd_user_dir/buildkit.service.d"
-  printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
-    >"$systemd_user_dir/containerd.service.d/nerdctl-full.conf"
-  cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
+    mkdir -p \
+      "$systemd_user_dir/containerd.service.d" \
+      "$systemd_user_dir/buildkit.service.d"
+    printf '[Service]\nEnvironment=CNI_PATH=%s\n' "$cni_path" \
+      >"$systemd_user_dir/containerd.service.d/nerdctl-full.conf"
+    cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
 [Service]
 Environment=CNI_PATH=$cni_path
 EOF
-  systemctl --user daemon-reload
+    systemctl --user daemon-reload
 
-  export PATH="$install_path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  export CNI_PATH="$cni_path"
-  systemctl --user set-environment "CNI_PATH=$cni_path"
-  "$install_path/containerd-rootless-setuptool.sh" install
+    export PATH="$install_path:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    export CNI_PATH="$cni_path"
+    systemctl --user set-environment "CNI_PATH=$cni_path"
+    "$install_path/containerd-rootless-setuptool.sh" install
 
-  buildkit_install_status=0
-  "$install_path/containerd-rootless-setuptool.sh" install-buildkit ||
-    buildkit_install_status=$?
+    buildkit_install_status=0
+    "$install_path/containerd-rootless-setuptool.sh" install-buildkit ||
+      buildkit_install_status=$?
 
-  cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
+    cat >"$systemd_user_dir/buildkit.service.d/nerdctl-full.conf" <<EOF
 [Service]
 Environment=CNI_PATH=$cni_path
 ExecStart=
 ExecStart=$install_path/containerd-rootless-setuptool.sh nsenter -- buildkitd --oci-worker=true --oci-worker-rootless=true --containerd-worker=false --oci-worker-net=bridge --oci-cni-binary-dir=$cni_path
 EOF
-  systemctl --user daemon-reload
+    systemctl --user daemon-reload
 
-  if [ "$buildkit_install_status" -ne 0 ]; then
-    systemctl --user restart buildkit.service
+    if [ "$buildkit_install_status" -ne 0 ]; then
+      systemctl --user restart buildkit.service
+    fi
+    systemctl --user is-active --quiet buildkit.service
   fi
-  systemctl --user is-active --quiet buildkit.service
 else
   printf '%s\n' \
     "Skipping rootless containerd and BuildKit setup: Linux user systemd is unavailable." >&2
