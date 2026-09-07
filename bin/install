@@ -8,14 +8,42 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 # shellcheck source=../lib/utils.bash
 source "${plugin_dir}/lib/utils.bash"
 
+install_path="${ASDF_INSTALL_PATH%/bin}/bin"
+systemd_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+
+rollback() {
+  local setuptool="$install_path/containerd-rootless-setuptool.sh"
+  local rootlesskit="$install_path/rootlesskit"
+
+  if [ "$(uname -s)" = "Linux" ] &&
+    command -v systemctl >/dev/null 2>&1 &&
+    systemctl --user show-environment >/dev/null 2>&1; then
+    if [ -x "$setuptool" ]; then
+      "$setuptool" uninstall-buildkit || :
+      "$setuptool" uninstall || :
+    fi
+
+    rm -rf \
+      "$systemd_user_dir/containerd.service.d" \
+      "$systemd_user_dir/buildkit.service.d"
+    systemctl --user daemon-reload || :
+
+    if [ -x "$rootlesskit" ]; then
+      "$rootlesskit" rm -rf "$HOME/.local/share/containerd" || :
+    fi
+  fi
+
+  rm -rf "$install_path"
+}
+
+trap 'status=$?; trap - EXIT; if [ "$status" -ne 0 ]; then rollback; fi; exit "$status"' EXIT
+
 install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
 
 if [ "$(uname -s)" = "Linux" ] &&
   command -v systemctl >/dev/null 2>&1 &&
   systemctl --user show-environment >/dev/null 2>&1; then
-  install_path="${ASDF_INSTALL_PATH%/bin}/bin"
   cni_path="$install_path/cni"
-  systemd_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 
   mkdir -p \
     "$systemd_user_dir/containerd.service.d" \
